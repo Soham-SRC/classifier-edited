@@ -68,7 +68,7 @@ int main( void )
 
     printf("hello pico fire alarm detection\n");
 
-    const uint OUTPUT_PIN = 16;
+    const uint OUTPUT_PIN = 14;
 
     gpio_set_function(OUTPUT_PIN, GPIO_FUNC_PWM);
     
