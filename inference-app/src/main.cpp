@@ -68,10 +68,12 @@ int main( void )
 
     printf("hello pico fire alarm detection\n");
 
-    gpio_set_function(PICO_DEFAULT_LED_PIN, GPIO_FUNC_PWM);
+    const uint OUTPUT_PIN = 16;
+
+    gpio_set_function(OUTPUT_PIN, GPIO_FUNC_PWM);
     
-    uint pwm_slice_num = pwm_gpio_to_slice_num(PICO_DEFAULT_LED_PIN);
-    uint pwm_chan_num = pwm_gpio_to_channel(PICO_DEFAULT_LED_PIN);
+    uint pwm_slice_num = pwm_gpio_to_slice_num(OUTPUT_PIN);
+    uint pwm_chan_num = pwm_gpio_to_channel(OUTPUT_PIN);
 
     // Set period of 256 cycles (0 to 255 inclusive)
     pwm_set_wrap(pwm_slice_num, 256);
