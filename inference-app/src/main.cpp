@@ -10,6 +10,8 @@
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
 
+#include "pico/time.h" // output mod
+
 extern "C" {
 #include "pico/pdm_microphone.h"
 }
@@ -137,12 +139,25 @@ int main( void )
         float prediction = ml_model.predict();
 
         if (prediction >= 0.5) {
-          printf("\t🔥 🔔\tdetected!\t(prediction = %f)\n\n", prediction);
+          printf("\t👶🏻👶🏻👶🏻👶🏻 🔔\tdetected!\t(prediction = %f)\n\n", prediction);
+
+            // Set PWM level to maximum (255) to keep the output high
+            pwm_set_chan_level(pwm_slice_num, pwm_chan_num, 255);
+    
+            // Wait for 5 seconds (5000 milliseconds)
+            sleep_ms(5000);
+    
+            // After the delay, set PWM level back to the prediction value
+            pwm_set_chan_level(pwm_slice_num, pwm_chan_num, prediction * 255);
         } else {
           printf("\t🔕\tNOT detected\t(prediction = %f)\n\n", prediction);
+        // Set PWM level based on the prediction value
+        pwm_set_chan_level(pwm_slice_num, pwm_chan_num, prediction * 255);
         }
 
-        pwm_set_chan_level(pwm_slice_num, pwm_chan_num, prediction * 255);
+       // pwm_set_chan_level(pwm_slice_num, pwm_chan_num, prediction * 255);
+
+        
     }
 
     return 0;
