@@ -8,6 +8,10 @@
 #include <stdio.h>
 
 #include "pico/stdlib.h"
+#include "pico/time.h"
+#include "hardware/gpio.h" // Include GPIO library
+
+#include "pico/stdlib.h"
 #include "hardware/pwm.h"
 
 #include "pico/time.h" // output mod
@@ -72,16 +76,9 @@ int main( void )
 
     const uint OUTPUT_PIN = 14;
 
-    gpio_set_function(OUTPUT_PIN, GPIO_FUNC_PWM);
-    
-    uint pwm_slice_num = pwm_gpio_to_slice_num(OUTPUT_PIN);
-    uint pwm_chan_num = pwm_gpio_to_channel(OUTPUT_PIN);
-
-    // Set period of 256 cycles (0 to 255 inclusive)
-    pwm_set_wrap(pwm_slice_num, 256);
-
-    // Set the PWM running
-    pwm_set_enabled(pwm_slice_num, true);
+    // Set the output pin
+    gpio_init(OUTPUT_PIN);
+    gpio_set_dir(OUTPUT_PIN, GPIO_OUT);
 
     if (!ml_model.init()) {
         printf("Failed to initialize ML model!\n");
@@ -139,25 +136,22 @@ int main( void )
         float prediction = ml_model.predict();
 
         if (prediction >= 0.5) {
-          printf("\t👶🏻👶🏻👶🏻👶🏻 🔔\tdetected!\t(prediction = %f)\n\n", prediction);
+            printf("\t👶🏻👶🏻👶🏻👶🏻 🔔\tdetected!\t(prediction = %f)\n\n", prediction);
 
-            // Set PWM level to maximum (255) to keep the output high
-            pwm_set_chan_level(pwm_slice_num, pwm_chan_num, 255);
+            // Set the output pin to high
+            gpio_put(OUTPUT_PIN, 1);
     
             // Wait for 5 seconds (5000 milliseconds)
             sleep_ms(5000);
     
-            // After the delay, set PWM level back to the prediction value
-            pwm_set_chan_level(pwm_slice_num, pwm_chan_num, prediction * 255);
+            // After the delay, set the output pin back to low
+            gpio_put(OUTPUT_PIN, 0);
         } else {
-          printf("\t🔕\tNOT detected\t(prediction = %f)\n\n", prediction);
-        // Set PWM level based on the prediction value
-        pwm_set_chan_level(pwm_slice_num, pwm_chan_num, prediction * 255);
+            printf("\t🔕\tNOT detected\t(prediction = %f)\n\n", prediction);
+
+            // Set the output pin based on the prediction value (0 for low, 1 for high)
+            gpio_put(OUTPUT_PIN, prediction >= 0.5 ? 1 : 0);
         }
-
-       // pwm_set_chan_level(pwm_slice_num, pwm_chan_num, prediction * 255);
-
-        
     }
 
     return 0;
