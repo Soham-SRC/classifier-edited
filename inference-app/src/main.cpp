@@ -142,7 +142,7 @@ int main( void )
             gpio_put(OUTPUT_PIN, 1);
     
             // Wait for 5 seconds (5000 milliseconds)
-            sleep_ms(5000);
+            sleep_ms(1000);
     
             // After the delay, set the output pin back to low
             gpio_put(OUTPUT_PIN, 0);
